@@ -33,22 +33,20 @@ let s:split_positions = {
 func! s:open_file_bookmark(...) abort
   let l:allowed_position_args = map(keys(s:split_positions), '"-".v:val')
   let l:bookmark_name = get(filter(copy(a:000), 'index(l:allowed_position_args, v:val) < 0'), -1, '')
-  let l:file_path = expand(get(g:file_bookmark, l:bookmark_name, ''))
+  let l:file_path = g:file_bookmark[l:bookmark_name]
 
-  if filereadable(l:file_path)
-    let l:position = g:file_bookmark_default_position
-    let l:position_args = filter(copy(a:000), 'index(l:allowed_position_args, v:val) >= 0')
-    if len(l:position_args)
-      let l:position = substitute(l:position_args[-1], '-', '', 'g')
-    endif
-    let l:split_position = get(s:split_positions, l:position, s:split_positions.tab)
-
-    silent exec l:split_position . ' split ' . l:file_path
+  let l:position = g:file_bookmark_default_position
+  let l:position_args = filter(copy(a:000), 'index(l:allowed_position_args, v:val) >= 0')
+  if len(l:position_args)
+    let l:position = substitute(l:position_args[-1], '-', '', 'g')
   endif
+  let l:split_position = get(s:split_positions, l:position, s:split_positions.tab)
+
+  silent exec l:split_position . ' split ' . l:file_path
 endfunc
 
 func! s:autocomplete(input, command_line, cursor_position) abort
-  return filter(keys(g:file_bookmark), 'v:val =~ a:input')
+  return filter(keys(g:file_bookmark), 'filereadable(expand(g:file_bookmark[v:val])) && v:val =~ a:input')
 endfunc
 
 comm! -nargs=+ -complete=customlist,s:autocomplete FileBookmark call s:open_file_bookmark(<f-args>)
