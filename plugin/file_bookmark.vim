@@ -11,15 +11,16 @@ if exists('g:loaded_file_bookmark') || &compatible || v:version < 700
 endif
 let g:loaded_file_bookmark = 1
 
-" let g:file_bookmark = {
-"   \ 'bookmark_name': '/path/to/file'
-"   \ }
 if !exists('g:file_bookmark')
   let g:file_bookmark = {}
 endif
 
 if !exists('g:file_bookmark_default_position')
   let g:file_bookmark_default_position = 'tab'
+endif
+
+if !exists('g:file_bookmark_cd_to_file_directory')
+  let g:file_bookmark_cd_to_file_directory = 1
 endif
 
 let s:split_positions = {
@@ -38,11 +39,14 @@ func! s:open_file_bookmark(...) abort
   let l:position = g:file_bookmark_default_position
   let l:position_args = filter(copy(a:000), 'index(l:allowed_position_args, v:val) >= 0')
   if len(l:position_args)
-    let l:position = substitute(l:position_args[-1], '-', '', 'g')
+    let l:position = substitute(l:position_args[-1], '-', '', '')
   endif
   let l:split_position = get(s:split_positions, l:position, s:split_positions.tab)
 
   silent exec l:split_position . ' split ' . l:file_path
+  if g:file_bookmark_cd_to_file_directory
+    silent exec 'lcd ' . expand('%:p:h')
+  end
 endfunc
 
 func! s:autocomplete(input, command_line, cursor_position) abort
