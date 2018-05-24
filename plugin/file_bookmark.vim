@@ -24,11 +24,16 @@ if !exists('g:file_bookmark_cd_to_file_directory')
 endif
 
 let s:positions = {
-  \ 'top':    'leftabove',
-  \ 'bottom': 'rightbelow',
-  \ 'left':   'vertical leftabove',
-  \ 'right':  'vertical rightbelow',
-  \ 'tab':    'tab'
+  \ 'current':      'edit',
+  \ 'tab':          'tab split',
+  \ 'top':          'leftabove split',
+  \ 'bottom':       'rightbelow split',
+  \ 'left':         'vertical leftabove split',
+  \ 'right':        'vertical rightbelow split',
+  \ 'top-full':     'topleft split',
+  \ 'bottom-full':  'botright split',
+  \ 'left-full':    'vertical topleft split',
+  \ 'right-full':   'vertical botright split'
   \ }
 
 func! s:open_file_bookmark(name, position) abort
@@ -39,7 +44,7 @@ func! s:open_file_bookmark(name, position) abort
     return
   end
 
-  silent exec l:position . ' split ' . l:file_path
+  silent exec l:position . l:file_path
   if g:file_bookmark_cd_to_file_directory
     silent exec 'lcd ' . expand('%:p:h')
   end
