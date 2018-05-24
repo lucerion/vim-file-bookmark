@@ -15,15 +15,15 @@ if !exists('g:file_bookmark')
   let g:file_bookmark = {}
 endif
 
-if !exists('g:file_bookmark_default_position')
-  let g:file_bookmark_default_position = 'tab'
+if !exists('g:file_default_position')
+  let g:file_bookmark_position = 'tab'
 endif
 
 if !exists('g:file_bookmark_cd_to_file_directory')
   let g:file_bookmark_cd_to_file_directory = 1
 endif
 
-let s:split_positions = {
+let s:positions = {
   \ 'top':    'leftabove',
   \ 'bottom': 'rightbelow',
   \ 'left':   'vertical leftabove',
@@ -31,26 +31,23 @@ let s:split_positions = {
   \ 'tab':    'tab'
   \ }
 
-func! s:open_file_bookmark(...) abort
-  let l:allowed_position_args = map(keys(s:split_positions), '"-".v:val')
-  let l:bookmark_name = get(filter(copy(a:000), 'index(l:allowed_position_args, v:val) < 0'), -1, '')
-  let l:file_path = g:file_bookmark[l:bookmark_name]
+func! s:open_file_bookmark(name, position) abort
+  let l:position = get(s:positions, a:position, s:positions.tab)
+  let l:file_path = get(g:file_bookmark, a:name, '')
 
-  let l:position = g:file_bookmark_default_position
-  let l:position_args = filter(copy(a:000), 'index(l:allowed_position_args, v:val) >= 0')
-  if len(l:position_args)
-    let l:position = substitute(l:position_args[-1], '-', '', '')
-  endif
-  let l:split_position = get(s:split_positions, l:position, s:split_positions.tab)
+  if !len(l:file_path)
+    return
+  end
 
-  silent exec l:split_position . ' split ' . l:file_path
+  silent exec l:position . ' split ' . l:file_path
   if g:file_bookmark_cd_to_file_directory
     silent exec 'lcd ' . expand('%:p:h')
   end
 endfunc
 
-func! s:autocomplete(input, command_line, cursor_position) abort
-  return filter(keys(g:file_bookmark), 'filereadable(expand(g:file_bookmark[v:val])) && v:val =~ a:input')
+func! s:autocomplete(input, _command_line, _cursor_position) abort
+  return filter(keys(g:file_bookmark), "filereadable(expand(get(g:file_bookmark, v:val, ''))) && v:val =~ a:input")
 endfunc
 
-comm! -nargs=+ -complete=customlist,s:autocomplete FileBookmark call s:open_file_bookmark(<f-args>)
+comm! -nargs=1 -complete=customlist,s:autocomplete FileBookmark
+  \ call s:open_file_bookmark(<q-args>, g:file_bookmark_position)
