@@ -23,36 +23,9 @@ if !exists('g:file_bookmark_cd_to_file_directory')
   let g:file_bookmark_cd_to_file_directory = 1
 endif
 
-let s:positions = {
-  \ 'current':      'edit',
-  \ 'tab':          'tab split',
-  \ 'top':          'leftabove split',
-  \ 'bottom':       'rightbelow split',
-  \ 'left':         'vertical leftabove split',
-  \ 'right':        'vertical rightbelow split',
-  \ 'top-full':     'topleft split',
-  \ 'bottom-full':  'botright split',
-  \ 'left-full':    'vertical topleft split',
-  \ 'right-full':   'vertical botright split'
-  \ }
-
-func! s:open_file_bookmark(name, position) abort
-  let l:position = get(s:positions, a:position, s:positions.tab)
-  let l:file_path = get(g:file_bookmark, a:name, '')
-
-  if !len(l:file_path)
-    return
-  end
-
-  silent exec l:position . l:file_path
-  if g:file_bookmark_cd_to_file_directory
-    silent exec 'lcd ' . expand('%:p:h')
-  end
-endfunc
-
 func! s:autocomplete(input, _command_line, _cursor_position) abort
   return filter(keys(g:file_bookmark), "filereadable(expand(get(g:file_bookmark, v:val, ''))) && v:val =~ a:input")
 endfunc
 
 comm! -nargs=1 -complete=customlist,s:autocomplete FileBookmark
-  \ call s:open_file_bookmark(<q-args>, g:file_bookmark_position)
+  \ call file_bookmark#open(<q-args>, g:file_bookmark_position)
