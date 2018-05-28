@@ -15,7 +15,7 @@ if !exists('g:file_bookmark')
   let g:file_bookmark = {}
 endif
 
-if !exists('g:file_default_position')
+if !exists('g:file_bookmark_position')
   let g:file_bookmark_position = 'tab'
 endif
 
@@ -27,5 +27,4 @@ func! s:autocomplete(input, _command_line, _cursor_position) abort
   return filter(keys(g:file_bookmark), "filereadable(expand(get(g:file_bookmark, v:val, ''))) && v:val =~ a:input")
 endfunc
 
-comm! -nargs=1 -complete=customlist,s:autocomplete FileBookmark
-  \ call file_bookmark#open(<q-args>, g:file_bookmark_position)
+comm! -nargs=1 -complete=customlist,s:autocomplete FileBookmark call file_bookmark#open(<q-args>, <q-mods>)

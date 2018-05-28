@@ -8,27 +8,34 @@
 
 let s:positions = {
   \ 'current':      'edit',
-  \ 'tab':          'tab split',
+  \ 'tab':          'tabedit',
   \ 'top':          'leftabove split',
   \ 'bottom':       'rightbelow split',
-  \ 'left':         'vertical leftabove split',
-  \ 'right':        'vertical rightbelow split',
+  \ 'left':         'leftabove vsplit',
+  \ 'right':        'rightbelow vsplit',
   \ 'top-full':     'topleft split',
   \ 'bottom-full':  'botright split',
-  \ 'left-full':    'vertical topleft split',
-  \ 'right-full':   'vertical botright split'
+  \ 'left-full':    'topleft vsplit',
+  \ 'right-full':   'botright vsplit'
   \ }
 
-func! file_bookmark#open(name, position) abort
-  let l:position = get(s:positions, a:position, s:positions.tab)
+func! file_bookmark#open(name, split) abort
   let l:file_path = get(g:file_bookmark, a:name, '')
-
   if !len(l:file_path)
     return
   end
 
-  silent exec l:position . ' ' . l:file_path
+  silent exec s:position(a:split) . ' ' . l:file_path
+
   if g:file_bookmark_cd_to_file_directory
     silent exec 'lcd ' . expand('%:p:h')
   end
+endfunc
+
+func! s:position(split)
+  if len(a:split)
+    return a:split . ' split'
+  endif
+
+  return get(s:positions, g:file_bookmark_position, s:positions.tab)
 endfunc
