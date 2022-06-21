@@ -15,10 +15,6 @@ if !exists('g:file_bookmark')
   let g:file_bookmark = {}
 endif
 
-if !exists('g:file_bookmark_position')
-  let g:file_bookmark_position = 'tab'
-endif
-
 if !exists('g:file_bookmark_cd_to_file_directory')
   let g:file_bookmark_cd_to_file_directory = 1
 endif
